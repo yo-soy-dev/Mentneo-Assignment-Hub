@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-const assignmentSchema = new mongoose.Schema({
-  title: String,
-  description: String,
-  deadline: Date,
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  role: String
 });
 
-export default mongoose.model("Assignment", assignmentSchema);
+export default mongoose.model("User", userSchema);

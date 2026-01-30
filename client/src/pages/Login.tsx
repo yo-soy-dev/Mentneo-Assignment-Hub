@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "../api/axios";
+import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
 interface LoginForm {
@@ -17,12 +17,27 @@ const Login = () => {
   const navigate = useNavigate();
   const { loginUser } = useAuth();
 
+
   const submit = async () => {
     try {
-      const res = await axios.post("/auth/login", form);
+      // Use your axios instance
+      const res = await api.post("/auth/login", form);
+
+      console.log("Login response:", res.data); // debug
+
+      // Check if user and token exist
+      if (!res.data || !res.data.user || !res.data.token) {
+        alert(res.data?.message || "Login failed: invalid response from server");
+        return;
+      }
 
       const token: string = res.data.token;
-      const role: "mentor" | "student" = res.data.user.role;
+      // const role: "mentor" | "student" = res.data.user.role;
+      const rawRole = String(res.data.user.role).toLowerCase();
+
+      const role: "mentor" | "student" =
+        rawRole === "mentor" ? "mentor" : "student";
+
 
       loginUser(token, role);
 
@@ -32,10 +47,15 @@ const Login = () => {
         navigate("/student");
       }
     } catch (error: any) {
-      console.error(error);
-      alert(error.response?.data?.msg || "Login failed");
+      console.error("Login error:", error);
+
+      // Axios error handling
+      const message =
+        error.response?.data?.message || error.response?.data?.msg || "Login failed";
+      alert(message);
     }
-  };
+  }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -44,34 +64,34 @@ const Login = () => {
           Welcome Back
         </h2>
 
-         <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:outline-none transition"
-          value={form.email}
-          onChange={(e) =>
-            setForm({ ...form, email: e.target.value })
-          }
-        />
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:outline-none transition"
+            value={form.email}
+            onChange={(e) =>
+              setForm({ ...form, email: e.target.value })
+            }
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:outline-none transition"
-          value={form.password}
-          onChange={(e) =>
-            setForm({ ...form, password: e.target.value })
-          }
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:outline-none transition"
+            value={form.password}
+            onChange={(e) =>
+              setForm({ ...form, password: e.target.value })
+            }
+          />
 
-        <button
-          onClick={submit}
-          className="w-full bg-sky-500 text-white py-2 rounded mt-3"
-        >
-          Login
-        </button>
+          <button
+            onClick={submit}
+            className="w-full bg-sky-500 text-white py-2 rounded mt-3"
+          >
+            Login
+          </button>
         </div>
 
         <p className="text-sm text-center mt-4">
