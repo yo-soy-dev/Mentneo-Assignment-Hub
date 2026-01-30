@@ -15,7 +15,7 @@ interface Submission {
 
 
 const ReviewSubmission = () => {
-  const { id } = useParams<{ id: string }>();
+  const { submissionId } = useParams<{ submissionId: string }>();
   const navigate = useNavigate();
 
   const [submission, setSubmission] = useState<Submission | null>(null);
@@ -23,34 +23,37 @@ const ReviewSubmission = () => {
   const [reviewing, setReviewing] = useState(false);
 
   useEffect(() => {
-    const fetchSubmission = async () => {
-      try {
-        const res = await api.get(`/submissions/${id}`);
-        setSubmission(res.data);
-      } catch (err) {
-        console.error("Fetch submission error", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  if (!submissionId) return;
 
-    fetchSubmission();
-  }, [id]);
-
-  const markReviewed = async () => {
+  const fetchSubmission = async () => {
     try {
-      setReviewing(true);
-      await api.patch(`/submissions/${id}/review`);
-      setSubmission((prev) =>
-        prev ? { ...prev, status: "Reviewed" } : prev
-      );
+      const res = await api.get(`/submissions/${submissionId}`);
+      setSubmission(res.data);
     } catch (err) {
-      console.error("Review error", err);
-      alert("Failed to mark as reviewed");
+      console.error("Fetch submission error", err);
     } finally {
-      setReviewing(false);
+      setLoading(false);
     }
   };
+
+  fetchSubmission();
+}, [submissionId]);
+
+const markReviewed = async () => {
+  if (!submissionId) return;
+  try {
+    setReviewing(true);
+    await api.patch(`/submissions/${submissionId}/review`);
+    setSubmission((prev) =>
+      prev ? { ...prev, status: "Reviewed" } : prev
+    );
+  } catch (err) {
+    console.error("Review error", err);
+    alert("Failed to mark as reviewed");
+  } finally {
+    setReviewing(false);
+  }
+};
 
   if (loading) {
     return (

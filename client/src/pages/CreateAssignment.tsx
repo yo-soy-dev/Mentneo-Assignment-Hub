@@ -26,7 +26,7 @@ const CreateAssignment = () => {
       });
 
       alert("Assignment created successfully!");
-      navigate("/mentor/dashboard");
+      navigate("/mentor");
     } catch (err) {
       console.error("Create assignment error", err);
       alert("Failed to create assignment.");

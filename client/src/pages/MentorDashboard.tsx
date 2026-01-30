@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
@@ -29,8 +30,22 @@ const MentorDashboard = () => {
         const assignmentRes = await assignmentApi.getAll();
         const submissionRes = await submissionApi.getAll();
 
-        setAssignments(assignmentRes?.data || []);
-        setSubmissions(submissionRes?.data || []);
+        // Map MongoDB _id to id
+        const assignments: Assignment[] = (assignmentRes?.data || []).map((a: any) => ({
+          id: a._id,
+          title: a.title,
+          description: a.description,
+        }));
+
+        const submissions: Submission[] = (submissionRes?.data || []).map((s: any) => ({
+          id: s._id,
+          studentName: s.studentId?.name || "Unknown",
+          assignmentTitle: s.assignmentId?.title || "Unknown",
+          status: s.status,
+        }));
+
+        setAssignments(assignments);
+        setSubmissions(submissions);
       } catch (err) {
         console.error("Mentor dashboard fetch error:", err);
         setAssignments([]);
@@ -39,10 +54,11 @@ const MentorDashboard = () => {
         setLoading(false);
       }
     };
+
     fetchDashboard();
   }, []);
 
-  const visibleSubmissions = submissions.filter((s) => s?.status !== "Pending");
+  const visibleSubmissions = submissions.filter((s) => s.status !== "Pending");
   const pendingReviews = visibleSubmissions.filter((s) => s.status === "Submitted").length;
 
   if (loading) {
@@ -56,14 +72,12 @@ const MentorDashboard = () => {
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar role="MENTOR" />
-
       <div className="flex-1 p-8">
+        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Mentor Dashboard</h1>
-            <p className="text-slate-500">
-              Create assignments and review student submissions
-            </p>
+            <p className="text-slate-500">Create assignments and review student submissions</p>
           </div>
           <button
             onClick={() => navigate("/mentor/create")}
@@ -108,6 +122,7 @@ const MentorDashboard = () => {
           )}
         </section>
 
+        {/* Recent Submissions */}
         <section>
           <h2 className="text-lg font-semibold mb-4">Recent Submissions</h2>
           {visibleSubmissions.length === 0 ? (

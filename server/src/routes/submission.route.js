@@ -3,7 +3,9 @@ import {
   submitAssignment,
   reviewSubmission,
   getSubmissions,
-  getMySubmission
+  getMySubmission,
+  getSubmissionById,
+  getSubmissionsByAssignment
 } from "../controllers/submission.controller.js";
 
 import { auth } from "../middleware/auth.middleware.js";
@@ -27,6 +29,8 @@ router.post(
 router.get("/", auth, mentorOnly, getSubmissions);
 router.patch("/:id/review", auth, mentorOnly, reviewSubmission);
 router.get("/my/:assignmentId", auth, studentOnly, getMySubmission);
+router.get("/:id", auth, mentorOnly, getSubmissionById);
+router.get("/assignment/:assignmentId", auth, mentorOnly, getSubmissionsByAssignment);
 
 
 export default router;

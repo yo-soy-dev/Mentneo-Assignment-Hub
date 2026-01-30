@@ -68,10 +68,11 @@ const SubmitAssignment = () => {
       setLoading(true);
       await api.post(`/submissions/${assignmentId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        timeout: 120000,
       });
       setStatus("Submitted");
       alert("Assignment submitted successfully!");
-      navigate("/student/dashboard");
+      navigate("/student");
     } catch (err) {
       console.error("Submission error", err);
       alert("Submission failed. Please try again.");
