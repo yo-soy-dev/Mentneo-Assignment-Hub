@@ -3,10 +3,10 @@ console.log("🔥 SERVER FILE LOADED");
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import connectDB from "./config/db.js";
-import authRoutes from "./routes/auth.route.js";
-import assignmentRoutes from "./routes/assignment.route.js";
-import submissionRoutes from "./routes/submission.route.js";
+import connectDB from "./src/config/db.js";
+import authRoutes from "./src/routes/auth.route.js";
+import assignmentRoutes from "./src/routes/assignment.route.js";
+import submissionRoutes from "./src/routes/submission.route.js";
 
 dotenv.config();
 connectDB();
