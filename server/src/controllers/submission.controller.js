@@ -13,9 +13,9 @@ export const submitAssignment = async (req, res) => {
       return res.status(400).json({ message: "Missing assignmentId" });
     }
 
-    const docPath = req.files?.doc?.[0]?.path;
-    const imagePath = req.files?.image?.[0]?.path;
-    const videoPath = req.files?.video?.[0]?.path;
+    const docPath = req.files?.doc?.[0]?.path || null;
+    const imagePath = req.files?.image?.[0]?.path || null;
+    const videoPath = req.files?.video?.[0]?.path || null;
 
     if (!docPath && !imagePath && !videoPath) {
       return res.status(400).json({ message: "Please upload at least one file" });
