@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { assignmentApi } from "../api/assignment.api";
+import toast from "react-hot-toast";
+
 
 interface Assignment {
   id: string;
@@ -17,12 +19,16 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     const fetchAssignments = async () => {
+      const toastId = toast.loading("Loading assignments...");
+
       try {
         const res = await assignmentApi.getStudentAssignments();
         setAssignments(res?.data || []);
+        toast.success("Assignments loaded!", { id: toastId });
       } catch (err) {
         console.error("Student dashboard fetch error:", err);
         setAssignments([]);
+         toast.error("Failed to load assignments", { id: toastId });
       } finally {
         setLoading(false);
       }
@@ -72,7 +78,7 @@ const StudentDashboard = () => {
                 disabled={a.status !== "Pending"}
                 onClick={() => navigate(`/student/submit/${a.id}`)}
                 className={`w-full py-2 rounded-lg text-white font-medium transition ${
-                  a.status === "Pending" ? "bg-sky-500 hover:bg-sky-600" : "bg-slate-300 cursor-not-allowed"
+                  a.status === "Pending" ? "bg-yellow-500 hover:bg-yellow-600" : "bg-slate-300 cursor-not-allowed"
                 }`}
               >
                 {a.status === "Pending" ? "Submit Assignment" : "Already Submitted"}
@@ -88,7 +94,7 @@ const StudentDashboard = () => {
 export default StudentDashboard;
 
 const StatCard = ({ title, value, highlight }: { title: string; value: number; highlight?: boolean }) => (
-  <div className={`rounded-xl p-5 bg-white shadow-sm border ${highlight ? "border-sky-500" : "border-slate-100"}`}>
+  <div className={`rounded-xl p-5 bg-white shadow-sm border ${highlight ? "border-yellow-500" : "border-slate-100"}`}>
     <h2 className="text-2xl font-bold text-slate-800">{value}</h2>
     <p className="text-slate-500">{title}</p>
   </div>
@@ -97,7 +103,7 @@ const StatCard = ({ title, value, highlight }: { title: string; value: number; h
 const StatusBadge = ({ status }: { status: string }) => {
   const styles: Record<string, string> = {
     Pending: "bg-yellow-100 text-yellow-700",
-    Submitted: "bg-sky-100 text-sky-700",
+    Submitted: "bg-yellow-100 text-yellow-700",
     Reviewed: "bg-green-100 text-green-700",
   };
   return <span className={`text-xs font-semibold px-3 py-1 rounded-full ${styles[status] || ""}`}>{status}</span>;

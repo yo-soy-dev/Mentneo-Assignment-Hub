@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import toast from "react-hot-toast";
 
 
 interface Submission {
@@ -41,15 +42,18 @@ const ReviewSubmission = () => {
 
 const markReviewed = async () => {
   if (!submissionId) return;
+  const toastId = toast.loading("Marking submission as reviewed...");
+
   try {
     setReviewing(true);
     await api.patch(`/submissions/${submissionId}/review`);
     setSubmission((prev) =>
       prev ? { ...prev, status: "Reviewed" } : prev
     );
+    toast.success("Submission marked as reviewed!", { id: toastId });
   } catch (err) {
     console.error("Review error", err);
-    alert("Failed to mark as reviewed");
+    toast.error("Failed to mark as reviewed", { id: toastId });
   } finally {
     setReviewing(false);
   }
@@ -143,7 +147,7 @@ export default ReviewSubmission;
 
 const StatusBadge = ({ status }: { status: string }) => {
   const styles = {
-    Submitted: "bg-sky-100 text-sky-700",
+    Submitted: "bg-yellow-100 text-yellow-700",
     Reviewed: "bg-green-100 text-green-700",
   };
 
@@ -200,7 +204,7 @@ const FilePreview = ({
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sky-500 font-medium hover:underline"
+          className="text-yellow-500 font-medium hover:underline"
         >
           View / Download File
         </a>

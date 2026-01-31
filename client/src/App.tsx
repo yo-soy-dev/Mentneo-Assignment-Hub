@@ -13,10 +13,16 @@ import SubmitAssignment from "./pages/SubmitAssignment";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
+import AppLayout from "./components/AppLayout";
+
+import { Toaster } from "react-hot-toast";
+
 
 function App() {
   return (
     <BrowserRouter>
+    <Toaster position="top-right" />
+
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
@@ -28,7 +34,9 @@ function App() {
             path="/mentor"
             element={
               <ProtectedRoute role="mentor">
+                <AppLayout>
                 <MentorDashboard />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -36,7 +44,9 @@ function App() {
             path="/mentor/create"
             element={
               <ProtectedRoute role="mentor">
+                <AppLayout>
                 <CreateAssignment />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -44,7 +54,9 @@ function App() {
             path="/mentor/submissions/:assignmentId"
             element={
               <ProtectedRoute role="mentor">
+                <AppLayout>
                 <AssignmentSubmissions />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -52,7 +64,9 @@ function App() {
             path="/mentor/review/:submissionId"
             element={
               <ProtectedRoute role="mentor">
+                <AppLayout>
                 <ReviewSubmission />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -61,7 +75,9 @@ function App() {
             path="/student"
             element={
               <ProtectedRoute role="student">
+                 <AppLayout>
                 <StudentDashboard />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -69,7 +85,9 @@ function App() {
             path="/student/submit/:assignmentId"
             element={
               <ProtectedRoute role="student">
+                <AppLayout>
                 <SubmitAssignment />
+                </AppLayout>
               </ProtectedRoute>
             }
           />

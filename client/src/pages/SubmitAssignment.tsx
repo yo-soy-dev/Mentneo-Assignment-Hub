@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import toast from "react-hot-toast";
+
 
 
 interface Assignment {
@@ -27,21 +29,27 @@ const SubmitAssignment = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!assignmentId) return; 
+    if (!assignmentId) return;
 
     const fetchData = async () => {
       try {
         const assignmentRes = await api.get(`/assignments/${assignmentId}`);
         setAssignment({
-          id: assignmentRes.data._id, 
+          id: assignmentRes.data._id,
           title: assignmentRes.data.title,
           description: assignmentRes.data.description,
           deadline: assignmentRes.data.deadline,
         });
 
-        const submissionRes = await api.get(`/submissions/my/${assignmentId}`);
-        if (submissionRes.data) {
+        try {
+          const submissionRes = await api.get(`/submissions/my/${assignmentId}`);
           setStatus(submissionRes.data.status);
+        } catch (err: any) {
+          if (err.response?.status === 404) {
+            setStatus("Pending");
+          } else {
+            throw err;
+          }
         }
       } catch (err) {
         console.error("Fetch error", err);
@@ -55,7 +63,7 @@ const SubmitAssignment = () => {
   const handleSubmit = async () => {
     if (!assignmentId) return;
     if (!textFile && !imageFile && !videoFile) {
-      alert("Please upload at least one file.");
+      toast.error("Please upload at least one file.");
       return;
     }
 
@@ -64,6 +72,8 @@ const SubmitAssignment = () => {
     if (imageFile) formData.append("image", imageFile);
     if (videoFile) formData.append("video", videoFile);
 
+    const toastId = toast.loading("Submitting assignment...");
+
     try {
       setLoading(true);
       await api.post(`/submissions/${assignmentId}`, formData, {
@@ -71,11 +81,11 @@ const SubmitAssignment = () => {
         timeout: 120000,
       });
       setStatus("Submitted");
-      alert("Assignment submitted successfully!");
+      toast.success("Assignment submitted successfully!", { id: toastId });
       navigate("/student");
     } catch (err) {
       console.error("Submission error", err);
-      alert("Submission failed. Please try again.");
+      toast.error("Submission failed. Please try again.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -138,10 +148,9 @@ const SubmitAssignment = () => {
           onClick={handleSubmit}
           disabled={status !== "Pending" || loading}
           className={`w-full py-3 rounded-lg font-semibold text-white transition
-            ${
-              status !== "Pending" || loading
-                ? "bg-slate-300 cursor-not-allowed"
-                : "bg-sky-500 hover:bg-sky-600"
+            ${status !== "Pending" || loading
+              ? "bg-slate-300 cursor-not-allowed"
+              : "bg-yellow-500 hover:bg-yellow-600"
             }`}
         >
           {loading ? "Submitting..." : "Submit Assignment"}
@@ -157,7 +166,7 @@ export default SubmitAssignment;
 const StatusBadge = ({ status }: { status: SubmissionStatus }) => {
   const styles = {
     Pending: "bg-yellow-100 text-yellow-700",
-    Submitted: "bg-sky-100 text-sky-700",
+    Submitted: "bg-yellow-100 text-yellow-700",
     Reviewed: "bg-green-100 text-green-700",
   };
 

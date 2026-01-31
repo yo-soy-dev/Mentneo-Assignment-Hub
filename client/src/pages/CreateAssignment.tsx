@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { assignmentApi } from "../api/assignment.api";
+import toast from "react-hot-toast";
+
 
 const CreateAssignment = () => {
   const navigate = useNavigate();
@@ -13,9 +15,11 @@ const CreateAssignment = () => {
 
   const handleCreate = async () => {
     if (!title.trim() || !description.trim()) {
-      alert("Title and description are required.");
+      toast.error("Title and description are required.");
       return;
     }
+
+     const toastId = toast.loading("Creating assignment...");
 
     try {
       setLoading(true);
@@ -25,11 +29,11 @@ const CreateAssignment = () => {
         deadline: deadline || undefined,
       });
 
-      alert("Assignment created successfully!");
+      toast.success("Assignment created successfully!", { id: toastId });
       navigate("/mentor");
     } catch (err) {
       console.error("Create assignment error", err);
-      alert("Failed to create assignment.");
+      toast.error("Failed to create assignment.", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -59,7 +63,7 @@ const CreateAssignment = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. React File Upload Task"
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
           </div>
 
@@ -72,7 +76,7 @@ const CreateAssignment = () => {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Explain what the student needs to submit..."
               rows={4}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
+              className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
             />
           </div>
 
@@ -96,7 +100,7 @@ const CreateAssignment = () => {
                 ${
                   loading
                     ? "bg-slate-300 cursor-not-allowed"
-                    : "bg-sky-500 hover:bg-sky-600"
+                    : "bg-yellow-500 hover:bg-yellow-600"
                 }`}
             >
               {loading ? "Creating..." : "Create Assignment"}

@@ -16,7 +16,7 @@ const Sidebar = ({ role }: SidebarProps) => {
     <aside className="w-64 min-h-screen bg-white border-r flex flex-col">
       {/* Brand */}
       <div className="p-6 border-b">
-        <h1 className="text-2xl font-bold text-sky-500">
+        <h1 className="text-2xl font-bold text-yellow-500">
           Mentneo
         </h1>
         <p className="text-xs text-slate-500">
@@ -65,8 +65,8 @@ const NavItem = ({
       className={({ isActive }) =>
         `block px-4 py-2 rounded-lg font-medium transition ${
           isActive
-            ? "bg-sky-500 text-white"
-            : "text-slate-600 hover:bg-sky-50 hover:text-sky-600"
+            ? "bg-yellow-500 text-white"
+            : "text-slate-600 hover:bg-yellow-50 hover:text-yellow-600"
         }`
       }
     >

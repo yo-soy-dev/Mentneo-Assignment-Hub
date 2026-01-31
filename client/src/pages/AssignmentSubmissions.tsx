@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import api from "../api/axios";
+import toast from "react-hot-toast";
+
 
 
 interface Submission {
@@ -32,6 +34,8 @@ const AssignmentSubmissions = () => {
             return; 
         }
 
+        const toastId = toast.loading("Loading submissions...");
+
         const fetchData = async () => {
             try {
                 const assignmentRes = await api.get(`/assignments/${assignmentId}`);
@@ -39,8 +43,11 @@ const AssignmentSubmissions = () => {
 
                 setAssignment(assignmentRes.data);
                 setSubmissions(submissionsRes.data);
+
+                toast.success("Submissions loaded!", { id: toastId });
             } catch (err) {
                 console.error("Fetch submissions error", err);
+                toast.error("Failed to load submissions.", { id: toastId });
             } finally {
                 setLoading(false);
             }
@@ -127,7 +134,7 @@ const AssignmentSubmissions = () => {
                                                 className={`px-4 py-1 rounded-md text-sm font-medium
                           ${s.status === "Reviewed"
                                                         ? "bg-slate-200 text-slate-500"
-                                                        : "bg-sky-500 text-white hover:bg-sky-600"
+                                                        : "bg-yellow-500 text-white hover:bg-yellow-600"
                                                     }`}
                                             >
                                                 {s.status === "Reviewed"
@@ -159,7 +166,7 @@ export default AssignmentSubmissions;
 
 const StatusBadge = ({ status }: { status: string }) => {
     const styles = {
-        Submitted: "bg-sky-100 text-sky-700",
+        Submitted: "bg-yellow-100 text-yellow-700",
         Reviewed: "bg-green-100 text-green-700",
     };
 

@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
+
 
 interface LoginForm {
   email: string;
@@ -20,19 +22,16 @@ const Login = () => {
 
   const submit = async () => {
     try {
-      // Use your axios instance
       const res = await api.post("/auth/login", form);
 
       console.log("Login response:", res.data); // debug
 
-      // Check if user and token exist
       if (!res.data || !res.data.user || !res.data.token) {
-        alert(res.data?.message || "Login failed: invalid response from server");
+        toast.error(res.data?.message || "Login failed: invalid response from server");
         return;
       }
 
       const token: string = res.data.token;
-      // const role: "mentor" | "student" = res.data.user.role;
       const rawRole = String(res.data.user.role).toLowerCase();
 
       const role: "mentor" | "student" =
@@ -49,10 +48,9 @@ const Login = () => {
     } catch (error: any) {
       console.error("Login error:", error);
 
-      // Axios error handling
       const message =
         error.response?.data?.message || error.response?.data?.msg || "Login failed";
-      alert(message);
+      toast.error(message);
     }
   }
 
@@ -60,7 +58,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 className="text-3xl text-sky-500 font-extrabold mb-6 text-center">
+        <h2 className="text-3xl text-yellow-500 font-extrabold mb-6 text-center">
           Welcome Back
         </h2>
 
@@ -69,7 +67,7 @@ const Login = () => {
           <input
             type="email"
             placeholder="Email"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:outline-none transition"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:outline-none transition"
             value={form.email}
             onChange={(e) =>
               setForm({ ...form, email: e.target.value })
@@ -79,7 +77,7 @@ const Login = () => {
           <input
             type="password"
             placeholder="Password"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:outline-none transition"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:outline-none transition"
             value={form.password}
             onChange={(e) =>
               setForm({ ...form, password: e.target.value })
@@ -88,7 +86,7 @@ const Login = () => {
 
           <button
             onClick={submit}
-            className="w-full bg-sky-500 text-white py-2 rounded mt-3"
+            className="w-full bg-yellow-500 text-white py-2 rounded mt-3"
           >
             Login
           </button>
@@ -96,7 +94,7 @@ const Login = () => {
 
         <p className="text-sm text-center mt-4">
           New here?{" "}
-          <Link to="/register" className="text-sky-500">
+          <Link to="/register" className="text-yellow-500">
             Create account
           </Link>
         </p>

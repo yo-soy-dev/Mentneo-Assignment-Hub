@@ -1,9 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { assignmentApi } from "../api/assignment.api";
 import { submissionApi } from "../api/submission.api";
+import toast from "react-hot-toast";
+
 
 interface Assignment {
   id: string;
@@ -26,11 +27,11 @@ const MentorDashboard = () => {
 
   useEffect(() => {
     const fetchDashboard = async () => {
+      const toastId = toast.loading("Loading dashboard...");
       try {
         const assignmentRes = await assignmentApi.getAll();
         const submissionRes = await submissionApi.getAll();
 
-        // Map MongoDB _id to id
         const assignments: Assignment[] = (assignmentRes?.data || []).map((a: any) => ({
           id: a._id,
           title: a.title,
@@ -46,10 +47,13 @@ const MentorDashboard = () => {
 
         setAssignments(assignments);
         setSubmissions(submissions);
+
+         toast.success("Dashboard loaded!", { id: toastId });
       } catch (err) {
         console.error("Mentor dashboard fetch error:", err);
         setAssignments([]);
         setSubmissions([]);
+        toast.error("Failed to load dashboard.", { id: toastId });
       } finally {
         setLoading(false);
       }
@@ -63,7 +67,7 @@ const MentorDashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center text-sky-500 font-semibold">
+      <div className="flex h-screen items-center justify-center text-yellow-500 font-semibold">
         Loading dashboard...
       </div>
     );
@@ -73,7 +77,6 @@ const MentorDashboard = () => {
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar role="MENTOR" />
       <div className="flex-1 p-8">
-        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Mentor Dashboard</h1>
@@ -81,20 +84,18 @@ const MentorDashboard = () => {
           </div>
           <button
             onClick={() => navigate("/mentor/create")}
-            className="bg-sky-500 text-white px-5 py-2 rounded-lg hover:bg-sky-600 transition"
+            className="bg-yellow-500 text-white px-5 py-2 rounded-lg hover:bg-yellow-600 transition"
           >
             + Create Assignment
           </button>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <StatCard title="Total Assignments" value={assignments.length} />
           <StatCard title="Total Submissions" value={visibleSubmissions.length} />
           <StatCard title="Pending Reviews" value={pendingReviews} highlight />
         </div>
 
-        {/* Recent Assignments */}
         <section className="mb-10">
           <h2 className="text-lg font-semibold mb-4">Recent Assignments</h2>
           {assignments.length === 0 ? (
@@ -112,7 +113,7 @@ const MentorDashboard = () => {
                   </div>
                   <button
                     onClick={() => navigate(`/mentor/submissions/${a.id}`)}
-                    className="text-sky-500 font-medium hover:underline"
+                    className="text-yellow-500 font-medium hover:underline"
                   >
                     View Submissions →
                   </button>
@@ -122,7 +123,6 @@ const MentorDashboard = () => {
           )}
         </section>
 
-        {/* Recent Submissions */}
         <section>
           <h2 className="text-lg font-semibold mb-4">Recent Submissions</h2>
           {visibleSubmissions.length === 0 ? (
@@ -153,7 +153,7 @@ const MentorDashboard = () => {
                           className={`px-4 py-1 rounded-md text-sm font-medium ${
                             s.status === "Reviewed"
                               ? "bg-slate-200 text-slate-400 cursor-not-allowed"
-                              : "bg-sky-500 text-white hover:bg-sky-600"
+                              : "bg-yellow-500 text-white hover:bg-yellow-600"
                           }`}
                         >
                           Review
@@ -174,7 +174,7 @@ const MentorDashboard = () => {
 export default MentorDashboard;
 
 const StatCard = ({ title, value, highlight }: { title: string; value: number; highlight?: boolean }) => (
-  <div className={`bg-white p-6 rounded-xl shadow-sm ${highlight ? "border-l-4 border-sky-500" : ""}`}>
+  <div className={`bg-white p-6 rounded-xl shadow-sm ${highlight ? "border-l-4 border-yellow-500" : ""}`}>
     <h2 className="text-3xl font-bold text-slate-800">{value}</h2>
     <p className="text-slate-500">{title}</p>
   </div>
@@ -184,7 +184,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   const base = "px-3 py-1 rounded-full text-xs font-semibold";
   const styles: Record<string, string> = {
     Pending: "bg-yellow-100 text-yellow-700",
-    Submitted: "bg-sky-100 text-sky-700",
+    Submitted: "bg-yellow-100 text-yellow-700",
     Reviewed: "bg-green-100 text-green-700",
   };
   return <span className={`${base} ${styles[status] || ""}`}>{status}</span>;
